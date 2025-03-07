@@ -1,0 +1,19 @@
+name: try-docker-build
+
+on: [push]
+
+jobs:
+  check-docker-build: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Within VM
+        run: |
+           echo "Running VM "
+           pwd
+           echo $PATH
+           which docker
+           docker --version
+           ls -alst
+           date
+
