@@ -19,11 +19,11 @@ jobs:
            ls -alst
            date
            ls -alst bb
-           ls -alst bb/bb42-Dockerfile 
+           ls -alst bb/Dockerfile 
 
            echo github.workspace ${{ github.workspace }}
            echo GITHUB_WORKSPACE $GITHUB_WORKSPACE  
-           env 
+
            ls -alst ${{ github.workspace }}/bb/Dockerfile 
            ls -alst $GITHUB_WORKSPACE/bb/Dockerfile 
 
@@ -33,4 +33,7 @@ jobs:
            docker run bb42
            docker save bb42 > bb42.tar
            tar tvf bb42.tar
+
+           ls -alst .  
+
 
