@@ -1,15 +1,17 @@
-#
-
+#https://docs.github.com/en/actions/writing-workflows/choosing-where-your-workflow-runs/running-jobs-in-a-container
 name: try-docker-container
+
 on: [push]
 
 jobs:
-  check-docker-run-action: 
+  check-docker-container-action: 
     runs-on: ubuntu-latest 
     container:
-      image: busybox
-      run: |
-         echo "Running Script in busybox "
-         pwd
+       image: busybox
+    steps:
+      - name: Within VM/busybox
+        run: |
+           echo "Running VM/bb command "
+           pwd
 
 
