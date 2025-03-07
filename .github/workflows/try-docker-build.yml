@@ -1,3 +1,5 @@
+# https://www.nutrient.io/blog/docker-import-export-vs-load-save/
+
 name: try-docker-build
 
 on: [push]
@@ -16,4 +18,9 @@ jobs:
            docker --version
            ls -alst
            date
+           docker build --tag bb42 bb/bb42-Dockerfile
+           docker image ls
+           docker run bb42
+           docker save bb42 > bb42.tar
+           tar tvf bb42.tar
 
