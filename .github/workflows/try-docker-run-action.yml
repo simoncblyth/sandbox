@@ -1,23 +1,24 @@
 # https://github.com/addnab/docker-run-action/tree/main
 # https://aschmelyun.com/blog/using-docker-run-inside-of-github-actions/
+#
 
 name: try-docker-run-action
 on: [push]
 
 jobs:
   check-docker-run-action: 
-  runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest 
     steps: 
       - name: checkout 
       - uses: actions/checkout@v4
       - name: docker-run-action-in-busybox 
       - uses: addnab/docker-run-action@v3
         with:
-           image: busybox
-           options: -v ${{ github.workspace }}:/work -e ABC=123
-           run: |
-               echo "Running Script ABC $ABC "
-               ls /work
-               pwd
+          image: busybox
+          options: -v ${{ github.workspace }}:/work -e ABC=123
+          run: |
+            echo "Running Script ABC $ABC "
+            ls /work
+            pwd
 
 
