@@ -27,7 +27,9 @@ jobs:
            ls -alst ${{ github.workspace }}/bb/bb42-Dockerfile 
            ls -alst $GITHUB_WORKSPACE/bb/bb42-Dockerfile 
 
-           docker build --tag bb42 ${{ github.workspace }}/bb/bb42-Dockerfile
+
+           cd bb
+           docker build --tag bb42 bb42-Dockerfile
            docker image ls
            docker run bb42
            docker save bb42 > bb42.tar
