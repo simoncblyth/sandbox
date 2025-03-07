@@ -1,0 +1,16 @@
+name: try-docker-pull
+
+on: [push]
+
+jobs:
+  check-docker-version: 
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Within VM
+        run: |
+           echo "Running VM "
+           pwd
+           echo $PATH
+           which docker
+           docker --version
+
