@@ -24,6 +24,8 @@ jobs:
            echo github.workspace ${{ github.workspace }}
            echo GITHUB_WORKSPACE $GITHUB_WORKSPACE  
            env 
+           ls -alst ${{ github.workspace }}/bb/bb42-Dockerfile 
+           ls -alst $GITHUB_WORKSPACE/bb/bb42-Dockerfile 
 
            docker build --tag bb42 ${{ github.workspace }}/bb/bb42-Dockerfile
            docker image ls
