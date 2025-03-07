@@ -9,9 +9,7 @@ jobs:
   check-docker-run-action: 
     runs-on: ubuntu-latest 
     steps: 
-      - name: checkout 
       - uses: actions/checkout@v4
-      - name: docker-run-action-in-busybox 
       - uses: addnab/docker-run-action@v3
         with:
           image: busybox
