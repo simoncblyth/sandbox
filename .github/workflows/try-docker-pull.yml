@@ -13,4 +13,4 @@ jobs:
            echo $PATH
            which docker
            docker --version
-
+           docker run hello-world
