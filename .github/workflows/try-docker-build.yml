@@ -20,7 +20,12 @@ jobs:
            date
            ls -alst bb
            ls -alst bb/bb42-Dockerfile 
-           docker build --tag bb42 bb/bb42-Dockerfile
+
+           echo github.workspace ${{ github.workspace }}
+           echo GITHUB_WORKSPACE $GITHUB_WORKSPACE  
+           env 
+
+           docker build --tag bb42 ${{ github.workspace }}/bb/bb42-Dockerfile
            docker image ls
            docker run bb42
            docker save bb42 > bb42.tar
