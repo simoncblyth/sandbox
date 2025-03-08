@@ -11,11 +11,25 @@ jobs:
         run: |
            echo "ssh-keyscan" 
            mkdir ~/.ssh 
-           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} 
            ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
            cat ~/.ssh/known_hosts 
 
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_GHA_VM_ID_RSA }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
       - name: Within VM
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
         run: |
            echo "Running VM "
            pwd
@@ -37,5 +51,15 @@ jobs:
            which which
            which ssh-keyscan
            which ssh-agent
-           which ssh-add         
+           which ssh-add 
+           which scp
+
+           echo hello from GHA VM > /tmp/hello.txt
+           date >> /tmp/hello.txt
+           date >> /tmp/hello.txt
+           cat /tmp/hello.txt
+
+           scp /tmp/hello.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+
+     
 
