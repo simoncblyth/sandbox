@@ -10,7 +10,7 @@ jobs:
       - name: Adding Known Hosts
         run: |
            echo "ssh-keyscan" 
-           ls ~/.ssh 
+           mkdir ~/.ssh 
            ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} 
            ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
            cat ~/.ssh/known_hosts 
