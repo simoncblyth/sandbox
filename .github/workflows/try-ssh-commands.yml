@@ -7,7 +7,16 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - uses: actions/checkout@v4
-      - name: Within VM
+  
+      - name: Adding Known Hosts
+         run: |
+           echo "ssh-keyscan" 
+           ls ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+
+     - name: Within VM
         run: |
            echo "Running VM "
            pwd
