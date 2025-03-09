@@ -1,0 +1,67 @@
+
+name: pull-docker-image-and-scp  
+on: [push]
+
+jobs:
+  job0-pull-docker-image-and-scp: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adding Known Hosts
+        run: |
+           echo "ssh-keyscan" 
+           mkdir ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
+      - name: Pull docker image and scp  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "[ Pull docker image and scp "
+           pwd
+           echo github.workspace ${{ github.workspace }}
+           ls -alst ${{ github.workspace }}/bb/Dockerfile 
+
+           docker pull rockylinux:9@sha256:d7be1c094cc5845ee815d4632fe377514ee6ebcf8efaed6892889657e5ddaaa6
+           docker image ls
+           docker save rockylinux:9@sha256:d7be1c094cc5845ee815d4632fe377514ee6ebcf8efaed6892889657e5ddaaa6 > rl9.tar
+           tar tvf rl9.tar
+           ls -alst .  
+ 
+           echo "[scp.0" 
+           date 
+           scp rl9.tar ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.0" 
+           echo "] Build docker image and scp "
+
+      - name: Another step to check continuity 
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+           echo "Another step "
+           pwd
+           ls -alst .  
+           echo "Hello from Another step " >> /tmp/another.txt
+
+           echo "[scp.1" 
+           date 
+           scp /tmp/another.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.1" 
+
+
