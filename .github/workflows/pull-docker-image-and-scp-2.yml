@@ -1,0 +1,71 @@
+
+name: pull-docker-image-and-scp  
+on: [push]
+
+jobs:
+  job0-pull-docker-image-and-scp: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adding Known Hosts
+        run: |
+           echo "ssh-keyscan" 
+           mkdir ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
+      - name: Pull docker image and scp  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "[ Pull docker image and scp "
+           pwd
+           echo github.workspace ${{ github.workspace }}
+           ls -alst ${{ github.workspace }}/bb/Dockerfile 
+
+           image=nvidia/cuda:12.4.1-devel-rockylinux9@sha256-483ac85033dfcf05066887e530fbb18b9f0abac2a84545900ef53733559fb20e
+           name=cuda12-4-1-devel-rl9-amd
+
+           echo "docker pull $image : and save to $name.tar " 
+           docker pull $image 
+           docker image ls
+           docker save $image > $name.tar
+           tar tvf $name.tar
+           ls -alst .  
+ 
+           echo "[scp.0" 
+           date 
+           scp $name.tar ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.0" 
+           echo "] Build docker image and scp "
+
+      - name: Another step to check continuity 
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+           echo "Another step "
+           pwd
+           ls -alst .  
+           echo "Hello from Another step " >> /tmp/another.txt
+
+           echo "[scp.1" 
+           date 
+           scp /tmp/another.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.1" 
+
+
