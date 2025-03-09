@@ -36,10 +36,12 @@ jobs:
            echo github.workspace ${{ github.workspace }}
            ls -alst ${{ github.workspace }}/bb/Dockerfile 
 
-           image=nvidia/cuda:12.4.1-devel-rockylinux9@sha256-483ac85033dfcf05066887e530fbb18b9f0abac2a84545900ef53733559fb20e
+           #image=nvidia/cuda:12.4.1-devel-rockylinux9@sha256-483ac85033dfcf05066887e530fbb18b9f0abac2a84545900ef53733559fb20e
+           #gives invalid reference format
+           image=nvidia/cuda:12.4.1-devel-rockylinux9
            name=cuda12-4-1-devel-rl9-amd
 
-           echo "docker pull $image : and save to $name.tar " 
+           echo "docker pull $image" 
            docker pull $image 
            docker image ls
            docker save $image > $name.tar
