@@ -20,7 +20,7 @@ jobs:
 
         run: |
            echo "Plant key and start agent " 
-           echo "${{ secrets.SANDBOX_GHA_VM_ID_RSA }}" > ~/.ssh/id_rsa
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
            chmod 600 ~/.ssh/id_rsa
            ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
            ssh-add ~/.ssh/id_rsa    
@@ -48,18 +48,11 @@ jobs:
            ls -alst ${{ github.workspace }}/bb/Dockerfile 
            ls -alst $GITHUB_WORKSPACE/bb/Dockerfile 
 
-           which which
-           which ssh-keyscan
-           which ssh-agent
-           which ssh-add 
-           which scp
-
-           echo hello from GHA VM > /tmp/hello.txt
+           echo hello from GHA VM SANDBOX_DEPLOY_LAST ${{ secrets.SANDBOX_DEPLOY_LAST }}  > /tmp/hello.txt
            date >> /tmp/hello.txt
            date >> /tmp/hello.txt
            cat /tmp/hello.txt
 
            scp /tmp/hello.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
 
-     
 
