@@ -1,0 +1,69 @@
+
+name: build-docker-image-and-scp  
+on: [push]
+
+jobs:
+  job0-build-docker-image-and-scp: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adding Known Hosts
+        run: |
+           echo "ssh-keyscan" 
+           mkdir ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
+      - name: Build docker image and scp  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "[ Build docker image and scp "
+           pwd
+           echo github.workspace ${{ github.workspace }}
+           ls -alst ${{ github.workspace }}/bb/Dockerfile 
+
+           cd bb 
+           docker build --tag bb42 .
+           docker image ls
+           docker run bb42
+           docker save bb42 > bb42.tar
+           tar tvf bb42.tar
+           ls -alst .  
+ 
+           echo "[scp.0" 
+           date 
+           scp bb42.tar ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.0" 
+           echo "] Build docker image and scp "
+
+      - name: Another step to check continuity 
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+           echo "Another step "
+           pwd
+           ls -alst .  
+           echo "Hello from Another step " >> /tmp/another.txt
+
+           echo "[scp.1" 
+           date 
+           scp /tmp/another.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.1" 
+
+
