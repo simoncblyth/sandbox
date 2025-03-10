@@ -50,7 +50,7 @@ jobs:
            cd nv 
 
            echo "[ build "
-           docker buildx build --build-arg IMAGE_REF=$ref --platform amd64 --tag $nam .
+           docker buildx build --build-arg FROM_REF=$ref --platform amd64 --tag $nam .
            echo "] build "
            
            echo "[ image ls "
@@ -81,7 +81,7 @@ jobs:
 
            echo "[scp.0" 
            date 
-           #scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
            date 
            echo "]scp.0" 
            echo "] Build docker image and scp "

@@ -1,6 +1,6 @@
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
-ARG IMAGE_REF
-FROM --platform=$BUILDPLATFORM $IMAGE_REF
+ARG FROM_REF
+FROM --platform=$BUILDPLATFORM $FROM_REF
 
 ARG TARGETARCH
 ARG TARGETOS
@@ -10,7 +10,7 @@ ARG BUILDARCH
 ARG BUILDOS
 ARG BUILDPLATFORM
 
-
+RUN echo "FROM_REF       $FROM_REF"
 RUN echo "TARGETPLATFORM $TARGETPLATFORM"
 RUN echo "TARGETOS       $TARGETOS"
 RUN echo "TARGETARCH     $TARGETARCH"
