@@ -55,9 +55,9 @@ jobs:
            #echo "] manifest inspect "
            # HUH: now giving permission denied
 
-           echo "[ buildx imagetools inspect "
-           docker buildx imagetools inspect $tag
-           echo "] buildx imagetools inspect "
+           #echo "[ buildx imagetools inspect "
+           #docker buildx imagetools inspect $tag
+           #echo "] buildx imagetools inspect "
 
            
            echo "[ save "
