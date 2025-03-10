@@ -46,9 +46,18 @@ jobs:
            docker buildx build --platform amd64 --tag $tag .
            echo "] build "
            
+           echo "[ image ls "
            docker image ls
+           echo "] image ls "
+
+           echo "[ manifest inspect "
            docker manifest inspect -v $tag
+           echo "] manifest inspect "
+           
+
+           echo "[ buildx imagetools inspect "
            docker buildx imagetools inspect $tag
+           echo "] buildx imagetools inspect "
 
            
            echo "[ save "
@@ -56,11 +65,14 @@ jobs:
            echo "] save "
 
 
+           echo "[ du/tar tvf/ls  "
            du -h $out
-
            tar tvf $out
            ls -alst $out
+           echo "] du/tar tvf/ls  "
  
+
+
            echo "[scp.0" 
            date 
            #scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
