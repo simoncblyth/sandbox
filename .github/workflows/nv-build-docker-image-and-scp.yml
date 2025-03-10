@@ -1,0 +1,84 @@
+
+name: build-docker-image-and-scp  
+on: [push]
+
+jobs:
+  job0-build-docker-image-and-scp: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adding Known Hosts
+        run: |
+           echo "ssh-keyscan" 
+           mkdir ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
+      - name: Build docker image and scp  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "[ Build docker image and scp "
+           pwd
+
+           echo github.workspace ${{ github.workspace }}
+           ls -alst ${{ github.workspace }}/nv/Dockerfile 
+
+           tag=nvidia_cuda_12_4_1_devel_rockylinux9_amd64
+           out=/tmp/$tag.tar
+
+           cd nv 
+
+           echo "[ build "
+           docker build --tag $tag .
+           echo "] build "
+           
+           docker image ls
+           
+           echo "[ save "
+           docker save $tag > $out
+           echo "] save "
+
+
+           du -h $out
+
+           tar tvf $out
+           ls -alst $out
+ 
+           echo "[scp.0" 
+           date 
+           #scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.0" 
+           echo "] Build docker image and scp "
+
+      - name: Another step to check continuity 
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+           echo "Another step out [$out] tag [$tag] "
+           pwd
+           ls -alst .  
+           echo "Hello from Another step " >> /tmp/another.txt
+           docker image ls
+
+           echo "[scp.1" 
+           date 
+           #scp /tmp/another.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.1" 
+
+
