@@ -42,7 +42,7 @@ jobs:
            name=cuda12-4-1-devel-rl9-amd
 
            echo "docker pull $image" 
-           docker pull $image 
+           docker pull --platform linux/amd64 $image 
            docker image ls
            docker manifest inspect -v $image
            docker buildx imagetools inspect $image
