@@ -1,6 +1,6 @@
-
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
-FROM --platform=$BUILDPLATFORM nvidia/cuda:12.4.1-devel-rockylinux9 
+ARG IMAGE_REF
+FROM --platform=$BUILDPLATFORM $IMAGE_REF
 
 ARG TARGETARCH
 ARG TARGETOS

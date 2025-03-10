@@ -34,16 +34,23 @@ jobs:
            echo "[ Build docker image and scp "
            pwd
 
-           echo github.workspace ${{ github.workspace }}
-           ls -alst ${{ github.workspace }}/nv/Dockerfile 
+           #ref=nvidia/cuda:12.4.1-devel-rockylinux9 
+           #nam=nvidia_cuda_12_4_1_devel_rockylinux9_amd64
 
-           tag=nvidia_cuda_12_4_1_devel_rockylinux9_amd64
-           out=/tmp/$tag.tar
+           ref=nvidia/cuda:12.4.1-runtime-rockylinux9 
+           nam=nvidia_cuda_12_4_1_runtime_rockylinux9_amd64
+
+
+           out=/tmp/$nam.tar
+
+           echo ref $ref
+           echo nam $nam
+           echo out $out
 
            cd nv 
 
            echo "[ build "
-           docker buildx build --platform amd64 --tag $tag .
+           docker buildx build --build-arg IMAGE_REF=$ref --platform amd64 --tag $nam .
            echo "] build "
            
            echo "[ image ls "
@@ -51,17 +58,17 @@ jobs:
            echo "] image ls "
 
            #echo "[ manifest inspect "
-           #docker manifest inspect -v $tag
+           #docker manifest inspect -v $nam
            #echo "] manifest inspect "
            # HUH: now giving permission denied
 
            #echo "[ buildx imagetools inspect "
-           #docker buildx imagetools inspect $tag
+           #docker buildx imagetools inspect $nam
            #echo "] buildx imagetools inspect "
 
            
            echo "[ save "
-           docker save $tag > $out
+           docker save $nam > $out
            echo "] save "
 
            echo "[ du/tar tvf/ls  "
@@ -83,7 +90,7 @@ jobs:
         env:
            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-           echo "Another step out [$out] tag [$tag] "
+           echo "Another step out [$out] nam [$nam] "
            pwd
            ls -alst .  
            echo "Hello from Another step " >> /tmp/another.txt
