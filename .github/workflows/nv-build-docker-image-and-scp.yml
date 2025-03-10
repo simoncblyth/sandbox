@@ -43,10 +43,13 @@ jobs:
            cd nv 
 
            echo "[ build "
-           docker build --tag $tag .
+           docker buildx build --platform amd64 --tag $tag .
            echo "] build "
            
            docker image ls
+           docker manifest inspect -v $tag
+           docker buildx imagetools inspect $tag
+
            
            echo "[ save "
            docker save $tag > $out
