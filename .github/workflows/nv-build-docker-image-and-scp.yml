@@ -50,10 +50,10 @@ jobs:
            docker image ls
            echo "] image ls "
 
-           echo "[ manifest inspect "
-           docker manifest inspect -v $tag
-           echo "] manifest inspect "
-           
+           #echo "[ manifest inspect "
+           #docker manifest inspect -v $tag
+           #echo "] manifest inspect "
+           # HUH: now giving permission denied
 
            echo "[ buildx imagetools inspect "
            docker buildx imagetools inspect $tag
@@ -63,7 +63,6 @@ jobs:
            echo "[ save "
            docker save $tag > $out
            echo "] save "
-
 
            echo "[ du/tar tvf/ls  "
            du -h $out
