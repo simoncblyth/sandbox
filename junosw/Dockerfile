@@ -1,0 +1,70 @@
+ARG FROM_REF="almalinux:9"
+FROM $FROM_REF
+
+ARG TARGETARCH
+ARG TARGETOS
+ARG TARGETPLATFORM
+
+ARG BUILDARCH
+ARG BUILDOS
+ARG BUILDPLATFORM
+
+RUN echo "FROM_REF       $FROM_REF"
+RUN echo "TARGETPLATFORM $TARGETPLATFORM"
+RUN echo "TARGETOS       $TARGETOS"
+RUN echo "TARGETARCH     $TARGETARCH"
+
+RUN echo "BUILDPLATFORM  $BUILDPLATFORM"
+RUN echo "BUILDOS        $BUILDOS"
+RUN echo "BUILDARCH      $BUILDARCH"
+
+
+ARG PASSWORD
+
+RUN useradd juno
+RUN usermod -G wheel -a juno
+RUN echo -n "assumeyes=1" >> /etc/yum.conf
+
+RUN dnf install 'dnf-command(config-manager)'
+RUN dnf config-manager --set-enabled crb
+
+RUN dnf install -y epel-release
+RUN dnf install -y almalinux-release-devel
+RUN dnf install -y sudo redhat-lsb-core wget subversion \
+        git make gcc-c++ gcc binutils \
+        libX11-devel libXpm-devel libXft-devel libXext-devel \
+        gcc-gfortran openssl-devel pcre-devel  \
+        mesa-libGL-devel glew-devel ftgl-devel mysql-devel \
+        fftw-devel cfitsio-devel graphviz-devel \
+        avahi-compat-libdns_sd-devel python3-devel \
+        libxml2-devel gsl-devel \
+        qt5-devel \
+        bzip2-devel imake patch ncurses-devel readline-devel \
+        sqlite-devel tk-devel openldap-devel \
+        motif motif-devel openmotif openmotif-devel \
+        wget libcurl-devel unzip bzip2 libicu-devel \
+        libglvnd-devel libXmu-devel 
+
+RUN echo 'juno ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+RUN sudo dnf install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm \
+  && sudo dnf install -y cvmfs \
+  && sudo mkdir /etc/cvmfs/keys/ihep.ac.cn \
+  && sudo curl -o /etc/cvmfs/keys/ihep.ac.cn/ihep.ac.cn.pub http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn/ihep.ac.cn.pub \
+  && sudo curl -o /etc/cvmfs/domain.d/ihep.ac.cn.conf http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn.conf \
+  && echo "CVMFS_REPOSITORIES='sft.cern.ch,juno.ihep.ac.cn,container.ihep.ac.cn'" | sudo tee    /etc/cvmfs/default.local \
+  && echo "CVMFS_HTTP_PROXY=DIRECT"                                                 | sudo tee -a /etc/cvmfs/default.local \
+  && cat /etc/cvmfs/default.local \
+  && sudo mkdir -p /cvmfs/sft.cern.ch \
+  && sudo mkdir -p /cvmfs/juno.ihep.ac.cn \
+  && sudo mkdir -p /cvmfs/container.ihep.ac.cn;
+
+RUN sudo dnf install -y expat-devel
+RUN sudo dnf install -y libtool
+RUN sudo dnf install -y libuuid-devel
+RUN sudo dnf install -y libnsl2-devel
+RUN sudo dnf install -y rsync
+
+USER juno
+WORKDIR /home/juno
+

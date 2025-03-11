@@ -1,0 +1,114 @@
+
+name: junosw-build-docker-image-and-scp  
+on: [push]
+
+jobs:
+  job0-junosw-build-docker-image-and-scp: 
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Adding Known Hosts
+        run: |
+           echo "ssh-keyscan" 
+           mkdir ~/.ssh 
+           ssh-keyscan -H ${{ secrets.SANDBOX_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+           cat ~/.ssh/known_hosts 
+
+      - name: Plant key and start agent  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "Plant key and start agent " 
+           echo "${{ secrets.SANDBOX_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+           ssh-add ~/.ssh/id_rsa    
+
+
+      - name: Build docker image and scp  
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+        run: |
+           echo "[ Build docker image and scp "
+           pwd
+
+           #ref=nvidia/cuda:12.4.1-devel-rockylinux9 
+           #nam=nvidia_cuda_12_4_1_devel_rockylinux9_amd64
+
+           #ref=nvidia/cuda:12.4.1-runtime-rockylinux9 
+           #nam=nvidia_cuda_12_4_1_runtime_rockylinux9_amd64
+           #ref=rockylinux:9
+
+           ref=almalinux:9
+           tag=junosw/base:el9
+           nam=junosw_base_el9
+           out=/tmp/$nam.tar
+
+           echo ref $ref
+           echo tag $tag
+           echo nam $nam
+           echo out $out
+
+           cd junosw
+
+           echo "[ build "
+           date
+           docker build --tag $tag --build-arg FROM_REF=$ref --platform amd64 .
+           date
+           echo "] build "
+           
+           echo "[ image ls "
+           date
+           docker image ls
+           date
+           echo "] image ls "
+
+           #echo "[ manifest inspect "
+           #docker manifest inspect -v $nam
+           #echo "] manifest inspect "
+           # HUH: now giving permission denied
+
+           #echo "[ buildx imagetools inspect "
+           #docker buildx imagetools inspect $nam
+           #echo "] buildx imagetools inspect "
+
+           
+           echo "[ save "
+           date
+           docker save $tag > $out
+           date
+           echo "] save "
+
+           echo "[ du/tar tvf/ls  "
+           du -h $out
+           tar tvf $out
+           ls -alst $out
+           echo "] du/tar tvf/ls  "
+ 
+           echo "[scp.0" 
+           date
+           echo SKIP scp 
+           scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.0" 
+           echo "] Build docker image and scp "
+
+      - name: Another step to check continuity 
+        env:
+           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+           echo "Another step out [$out] nam [$nam] "
+           pwd
+           ls -alst .  
+           echo "Hello from Another step " >> /tmp/another.txt
+           docker image ls
+
+           echo "[scp.1" 
+           date 
+           scp /tmp/another.txt ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date 
+           echo "]scp.1" 
+
+
