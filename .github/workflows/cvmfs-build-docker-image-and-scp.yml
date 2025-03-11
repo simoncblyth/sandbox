@@ -80,8 +80,9 @@ jobs:
            echo "] du/tar tvf/ls  "
  
            echo "[scp.0" 
-           date 
-           scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
+           date
+           echo SKIP scp 
+           #scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
            date 
            echo "]scp.0" 
            echo "] Build docker image and scp "

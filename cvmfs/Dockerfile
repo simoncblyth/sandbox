@@ -38,5 +38,7 @@ RUN dnf install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-
 
 
 RUN ls -alst /cvmfs/juno.ihep.ac.cn/
+RUN cd  /cvmfs/juno.ihep.ac.cn/ && ls -alst
+
 
 
