@@ -3,10 +3,32 @@ usage(){ cat << EOU
 docker-mock-gitlab-ci.sh:usage
 ===============================
 
-Unfortunately "gitlab-runner exec" local running functionality 
-has been removed since gitlab-runner 16.0
+Unfortunately "gitlab-runner exec" functionality for local workflow testing 
+is removed from gitlab-runner 16.0::
 
-This script provides a manual workaround for that, using two sessions: 
+    A[blyth@localhost ~]$ gitlab-runner exec
+    Runtime platform                                    arch=amd64 os=linux pid=1674561 revision=bbf75488 version=17.9.1
+    FATAL: Command exec not found.                     
+
+    A[blyth@localhost ~]$ which gitlab-runner
+    /usr/bin/gitlab-runner
+
+    A[blyth@localhost ~]$ gitlab-runner -v
+    Version:      17.9.1
+    Git revision: bbf75488
+    Git branch:   17-9-stable
+    GO version:   go1.23.2 X:cacheprog
+    Built:        2025-03-07T23:57:02Z
+    OS/Arch:      linux/amd64
+
+
+* https://gitlab.com/gitlab-org/gitlab/-/issues/385235
+
+  "Deprecation of the gitlab-runner exec command from GitLab Runner"
+
+
+This script provides a manual workaround to do similar 
+to the old "gitlab-runner exec", using two sessions: 
 
 "docker run" 
     start a container, interactively for checking the build in progress 
