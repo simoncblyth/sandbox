@@ -41,7 +41,8 @@ jobs:
 
            tag=junosw/cuda:12.4.1-${recipe}-rockylinux9
            nam=junosw_cuda_12_4_1_${recipe}_rockylinux9
-           out=/tmp/$nam.tar
+           #out=/tmp/$nam.tar   ## suspect less quota on /tmp 
+           out=$nam.tar
 
 
            echo recipe $recipe
@@ -54,6 +55,11 @@ jobs:
            docker build --tag $tag --platform linux/amd64 - < junosw/Dockerfile-junosw-cuda-${recipe}-rl9
            date
            echo "] build "
+
+
+           echo "[ df -h "
+           df -h
+           echo "] df -h "
            
            echo "[ image ls "
            date
@@ -76,6 +82,12 @@ jobs:
            docker save $tag > $out
            date
            echo "] save "
+
+
+           echo "[ df -h "
+           df -h
+           echo "] df -h "
+ 
 
            echo "[ du/tar tvf/ls  "
            du -h $out

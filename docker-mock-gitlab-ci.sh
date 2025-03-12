@@ -66,6 +66,20 @@ docker-mock-gitlab-ci.sh:info
    docker_ref : $(docker_ref)
    docker_nam : $(docker_nam)
 
+
++--------------+-----------+----------------------+
+| nam          | size      |  notes               |
++==============+===========+======================+
+| base         |   2.51GB  |  no CUDA             |
++--------------+-----------+----------------------+
+| runtime      |   5.81GB  |  misses headers      |
++--------------+-----------+----------------------+
+| runtimeplus  |   8.88GB  |  cherrypick devel    |      
++--------------+-----------+----------------------+
+| devel        |  >10GB ?  |                      | 
++--------------+-----------+----------------------+
+
+
 EOI
 }
 
@@ -74,19 +88,13 @@ defarg=script
 arg=${1:-$defarg}
 
 
-# 2.51GB
-#docker_ref(){  echo junosw/base:el9 ; }
-#docker_nam(){ echo  jel9 ; }
 
-# 5.81GB : but misses needed headers
-docker_ref(){  echo junosw/cuda:12.4.1-runtime-rockylinux9 ; }
-docker_nam(){ echo  jcrl9 ; }
+#docker_nam(){ echo base ; }           
+#docker_nam(){ echo runtime ; }       
+docker_nam(){ echo runtimeplus ; }   
+#docker_nam(){ echo devel ; }       
 
-
-
-# expect > 10GB
-#docker_ref(){  echo junosw/cuda:12.4.1-devel-rockylinux9 ; }
-#docker_nam(){ echo  jcrl9_dev ; }
+docker_ref(){  echo junosw/cuda:12.4.1-$(docker_nam)-rockylinux9 ; }
 
 
 docker_run_opts(){ 
