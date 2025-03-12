@@ -73,14 +73,40 @@ EOI
 defarg=script
 arg=${1:-$defarg}
 
-docker_ref(){  echo junosw/base:el9 ; }
-docker_nam(){ echo jel9 ; }
+
+# 2.51GB
+#docker_ref(){  echo junosw/base:el9 ; }
+#docker_nam(){ echo  jel9 ; }
+
+# 5.81GB : but misses needed headers
+docker_ref(){  echo junosw/cuda:12.4.1-runtime-rockylinux9 ; }
+docker_nam(){ echo  jcrl9 ; }
+
+
+
+# expect > 10GB
+#docker_ref(){  echo junosw/cuda:12.4.1-devel-rockylinux9 ; }
+#docker_nam(){ echo  jcrl9_dev ; }
+
+
+docker_run_opts(){ 
+   local ref=$(docker_ref)
+   if [ "${ref/cuda}" != "$ref" ]; then
+      cat << EOO
+         --runtime=nvidia --gpus=all
+EOO
+   else
+       echo -n
+   fi 
+}
+
 
 docker_run()
 {
    : docker_run - starting container with mounts from host into container 
    type $FUNCNAME
    docker run --rm -it \
+      $(docker_run_opts) \
       --name $(docker_nam) \
       --mount type=bind,source=/cvmfs,target=/cvmfs,ro \
       --mount type=bind,source=$HOME/junosw,target=/home/juno/junosw \

@@ -34,43 +34,24 @@ jobs:
            echo "[ Build docker image and scp "
            pwd
 
-           #recipe=default
-           recipe=cuda_runtime
-           #recipe=cuda_devel
+           #recipe=base
+           #recipe=runtime
+           recipe=runtimeplus
+           #recipe=devel
 
-           if [ "$recipe" == "default" ]; then
-
-             ref=almalinux:9
-             tag=junosw/base:el9
-             nam=junosw_base_el9
-
-           elif [ "$recipe" == "cuda_runtime" ]; then
-
-             ref=nvidia/cuda:12.4.1-runtime-rockylinux9 
-             tag=junosw/cuda:12.4.1-runtime-rockylinux9
-             nam=junosw_cuda_12_4_1_runtime_rockylinux9
-
-           elif [ "$recipe" == "cuda_devel" ]; then
-
-             ref=nvidia/cuda:12.4.1-devel-rockylinux9 
-             tag=junosw/cuda:12.4.1-devel-rockylinux9
-             nam=junosw_cuda_12_4_1_devel_rockylinux9
-
-           fi 
+           tag=junosw/cuda:12.4.1-${recipe}-rockylinux9
+           nam=junosw_cuda_12_4_1_${recipe}_rockylinux9
            out=/tmp/$nam.tar
 
 
            echo recipe $recipe
-           echo ref $ref
            echo tag $tag
            echo nam $nam
            echo out $out
 
-           cd junosw
-
            echo "[ build "
            date
-           docker build --tag $tag --build-arg FROM_REF=$ref --platform linux/amd64 .
+           docker build --tag $tag --platform linux/amd64 - < junosw/Dockerfile-junosw-cuda-${recipe}-rl9
            date
            echo "] build "
            
@@ -104,7 +85,6 @@ jobs:
  
            echo "[scp.0" 
            date
-           echo SKIP scp 
            scp $out ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
            date 
            echo "]scp.0" 

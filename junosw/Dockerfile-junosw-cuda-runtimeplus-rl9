@@ -1,5 +1,30 @@
-ARG FROM_REF="almalinux:9"
-FROM $FROM_REF
+FROM nvidia/cuda:12.4.1-runtime-rockylinux9 
+
+# https://gitlab.com/nvidia/container-images/cuda.git
+# ~/cuda/dist/12.4.1/rockylinux9/devel/Dockerfile
+
+ENV NV_CUDA_LIB_VERSION 12.4.1-1
+ENV NV_CUDA_CUDART_DEV_VERSION 12.4.127-1
+
+RUN dnf install -y \
+    make \
+    findutils \
+    cuda-command-line-tools-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-libraries-devel-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-minimal-build-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-cudart-devel-12-4-${NV_CUDA_CUDART_DEV_VERSION} \
+    && dnf clean all \
+    && rm -rf /var/cache/yum/*
+
+#    ${NV_NVPROF_DEV_PACKAGE} \
+#    cuda-nvml-devel-12-4-${NV_NVML_DEV_VERSION} \
+#    libcublas-devel-12-4-${NV_LIBCUBLAS_DEV_VERSION} \
+#    ${NV_LIBNPP_DEV_PACKAGE} \
+#    ${NV_LIBNCCL_DEV_PACKAGE} \
+#    ${NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE} \
+
+
+
 
 ARG TARGETARCH
 ARG TARGETOS
@@ -9,8 +34,6 @@ ARG BUILDARCH
 ARG BUILDOS
 ARG BUILDPLATFORM
 
-RUN echo "FROM_REF       $FROM_REF"
-RUN echo "FROM_REF       ${FROM_REF}"
 RUN echo "TARGETPLATFORM $TARGETPLATFORM"
 RUN echo "TARGETOS       $TARGETOS"
 RUN echo "TARGETARCH     $TARGETARCH"
@@ -30,9 +53,9 @@ RUN dnf install 'dnf-command(config-manager)'
 RUN dnf config-manager --set-enabled crb
 
 RUN dnf install -y epel-release
-RUN dnf install -y rocky-repos   # looks similar to almalinux-release-devel
+RUN dnf install -y rocky-repos   # looks equivalent to almalinux-release-devel
 RUN dnf install -y sudo 
-#RUN dnf install -y redhat-lsb-core 
+#RUN dnf install -y redhat-lsb-core  # skipped as not easily available for rockylinux9   
 RUN dnf install -y wget 
 RUN dnf install -y subversion
 RUN dnf install -y git 
