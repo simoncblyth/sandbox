@@ -1,32 +1,4 @@
-FROM nvidia/cuda:12.4.1-runtime-rockylinux9 
-
-
-# https://gitlab.com/nvidia/container-images/cuda.git
-# ~/cuda/dist/12.4.1/rockylinux9/devel/Dockerfile
-
-ENV NV_CUDA_LIB_VERSION 12.4.1-1
-ENV NV_CUDA_CUDART_DEV_VERSION 12.4.127-1
-
-RUN dnf install -y \
-    make \
-    findutils \
-    cuda-command-line-tools-12-4-${NV_CUDA_LIB_VERSION} \
-    cuda-libraries-devel-12-4-${NV_CUDA_LIB_VERSION} \
-    cuda-minimal-build-12-4-${NV_CUDA_LIB_VERSION} \
-    cuda-cudart-devel-12-4-${NV_CUDA_CUDART_DEV_VERSION} \
-    && dnf clean all \
-    && rm -rf /var/cache/yum/*
-
-#    ${NV_NVPROF_DEV_PACKAGE} \
-#    cuda-nvml-devel-12-4-${NV_NVML_DEV_VERSION} \
-#    libcublas-devel-12-4-${NV_LIBCUBLAS_DEV_VERSION} \
-#    ${NV_LIBNPP_DEV_PACKAGE} \
-#    ${NV_LIBNCCL_DEV_PACKAGE} \
-#    ${NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE} \
-
-ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
-
-
+FROM almalinux:9
 
 ARG PASSWORD
 
@@ -38,10 +10,8 @@ RUN dnf install 'dnf-command(config-manager)'
 RUN dnf config-manager --set-enabled crb
 
 RUN dnf install -y epel-release
-RUN dnf install -y rocky-repos   # looks equivalent to almalinux-release-devel
-
-#  skipped : redhat-lsb-core :  as not easily available for rockylinux9   
-RUN dnf install -y sudo wget subversion \
+RUN dnf install -y almalinux-release-devel
+RUN dnf install -y sudo redhat-lsb-core wget subversion \
         git make gcc-c++ gcc binutils \
         libX11-devel libXpm-devel libXft-devel libXext-devel \
         gcc-gfortran openssl-devel pcre-devel  \
@@ -75,10 +45,6 @@ RUN sudo dnf install -y libtool
 RUN sudo dnf install -y libuuid-devel
 RUN sudo dnf install -y libnsl2-devel
 RUN sudo dnf install -y rsync
-
-# Github Action VM disk quota limit 14G
-RUN dnf clean all && rm -rf /var/cache/yum/*
-
 
 USER juno
 WORKDIR /home/juno
