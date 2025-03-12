@@ -31,18 +31,31 @@ RUN dnf config-manager --set-enabled crb
 
 RUN dnf install -y epel-release
 RUN dnf install -y rocky-repos   # looks similar to almalinux-release-devel
-RUN dnf install -y sudo redhat-lsb-core wget subversion \
-        git make gcc-c++ gcc binutils \
+RUN dnf install -y \
+        sudo redhat-lsb-core wget subversion \
+        git make gcc-c++ gcc binutils
+
+RUN dnf install -y \
         libX11-devel libXpm-devel libXft-devel libXext-devel \
-        gcc-gfortran openssl-devel pcre-devel  \
+        gcc-gfortran openssl-devel pcre-devel 
+
+RUN dnf install -y \
         mesa-libGL-devel glew-devel ftgl-devel mysql-devel \
-        fftw-devel cfitsio-devel graphviz-devel \
+        fftw-devel cfitsio-devel graphviz-devel
+
+RUN dnf install -y \
         avahi-compat-libdns_sd-devel python3-devel \
-        libxml2-devel gsl-devel \
+        libxml2-devel gsl-devel
+
+RUN dnf install -y \
         qt5-devel \
-        bzip2-devel imake patch ncurses-devel readline-devel \
+        bzip2-devel imake patch ncurses-devel readline-devel
+ 
+RUN dnf install -y \
         sqlite-devel tk-devel openldap-devel \
-        motif motif-devel openmotif openmotif-devel \
+        motif motif-devel openmotif openmotif-devel
+
+RUN dnf install -y \
         wget libcurl-devel unzip bzip2 libicu-devel \
         libglvnd-devel libXmu-devel 
 
