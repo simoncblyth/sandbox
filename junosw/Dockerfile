@@ -31,33 +31,53 @@ RUN dnf config-manager --set-enabled crb
 
 RUN dnf install -y epel-release
 RUN dnf install -y rocky-repos   # looks similar to almalinux-release-devel
-RUN dnf install -y \
-        sudo redhat-lsb-core wget subversion \
-        git make gcc-c++ gcc binutils
-
-RUN dnf install -y \
-        libX11-devel libXpm-devel libXft-devel libXext-devel \
-        gcc-gfortran openssl-devel pcre-devel 
-
-RUN dnf install -y \
-        mesa-libGL-devel glew-devel ftgl-devel mysql-devel \
-        fftw-devel cfitsio-devel graphviz-devel
-
-RUN dnf install -y \
-        avahi-compat-libdns_sd-devel python3-devel \
-        libxml2-devel gsl-devel
-
-RUN dnf install -y \
-        qt5-devel \
-        bzip2-devel imake patch ncurses-devel readline-devel
- 
-RUN dnf install -y \
-        sqlite-devel tk-devel openldap-devel \
-        motif motif-devel openmotif openmotif-devel
-
-RUN dnf install -y \
-        wget libcurl-devel unzip bzip2 libicu-devel \
-        libglvnd-devel libXmu-devel 
+RUN dnf install -y sudo 
+#RUN dnf install -y redhat-lsb-core 
+RUN dnf install -y wget 
+RUN dnf install -y subversion
+RUN dnf install -y git 
+RUN dnf install -y make 
+RUN dnf install -y gcc-c++ 
+RUN dnf install -y gcc 
+RUN dnf install -y binutils
+RUN dnf install -y libX11-devel 
+RUN dnf install -y libXpm-devel 
+RUN dnf install -y libXft-devel 
+RUN dnf install -y libXext-devel
+RUN dnf install -y gcc-gfortran
+RUN dnf install -y openssl-devel
+RUN dnf install -y pcre-devel 
+RUN dnf install -y mesa-libGL-devel
+RUN dnf install -y glew-devel
+RUN dnf install -y ftgl-devel
+RUN dnf install -y mysql-devel
+RUN dnf install -y fftw-devel 
+RUN dnf install -y cfitsio-devel 
+RUN dnf install -y graphviz-devel
+RUN dnf install -y avahi-compat-libdns_sd-devel
+RUN dnf install -y python3-devel
+RUN dnf install -y libxml2-devel 
+RUN dnf install -y gsl-devel
+RUN dnf install -y qt5-devel 
+RUN dnf install -y bzip2-devel 
+RUN dnf install -y imake 
+RUN dnf install -y patch 
+RUN dnf install -y ncurses-devel 
+RUN dnf install -y readline-devel
+RUN dnf install -y sqlite-devel 
+RUN dnf install -y tk-devel 
+RUN dnf install -y openldap-devel
+RUN dnf install -y motif 
+RUN dnf install -y motif-devel 
+RUN dnf install -y openmotif 
+RUN dnf install -y openmotif-devel
+RUN dnf install -y wget 
+RUN dnf install -y libcurl-devel 
+RUN dnf install -y unzip
+RUN dnf install -y bzip2
+RUN dnf install -y libicu-devel
+RUN dnf install -y libglvnd-devel 
+RUN dnf install -y libXmu-devel 
 
 RUN echo 'juno ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
