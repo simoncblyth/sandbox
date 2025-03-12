@@ -34,18 +34,33 @@ jobs:
            echo "[ Build docker image and scp "
            pwd
 
-           #ref=nvidia/cuda:12.4.1-devel-rockylinux9 
-           #nam=nvidia_cuda_12_4_1_devel_rockylinux9_amd64
+           #recipe=default
+           recipe=cuda_runtime
+           #recipe=cuda_devel
 
-           #ref=nvidia/cuda:12.4.1-runtime-rockylinux9 
-           #nam=nvidia_cuda_12_4_1_runtime_rockylinux9_amd64
-           #ref=rockylinux:9
+           if [ "$recipe" == "default" ]; then
 
-           ref=almalinux:9
-           tag=junosw/base:el9
-           nam=junosw_base_el9
+             ref=almalinux:9
+             tag=junosw/base:el9
+             nam=junosw_base_el9
+
+           elif [ "$recipe" == "cuda_runtime" ]; then
+
+             ref=nvidia/cuda:12.4.1-runtime-rockylinux9 
+             tag=junosw/cuda:12.4.1-runtime-rockylinux9
+             nam=junosw_cuda_12_4_1_runtime_rockylinux9
+
+           elif [ "$recipe" == "cuda_devel" ]; then
+
+             ref=nvidia/cuda:12.4.1-devel-rockylinux9 
+             tag=junosw/cuda:12.4.1-devel-rockylinux9
+             nam=junosw_cuda_12_4_1_devel_rockylinux9
+
+           fi 
            out=/tmp/$nam.tar
 
+
+           echo recipe $recipe
            echo ref $ref
            echo tag $tag
            echo nam $nam
@@ -55,7 +70,7 @@ jobs:
 
            echo "[ build "
            date
-           docker build --tag $tag --build-arg FROM_REF=$ref --platform amd64 .
+           docker build --tag $tag --build-arg FROM_REF=$ref --platform linux/amd64 .
            date
            echo "] build "
            

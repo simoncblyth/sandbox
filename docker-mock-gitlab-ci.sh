@@ -28,36 +28,32 @@ is removed from gitlab-runner 16.0::
 
 
 This script provides a manual workaround to do similar 
-to the old "gitlab-runner exec", using two sessions: 
+to the old "gitlab-runner exec".
 
-"docker run" 
-    start a container, interactively for checking the build in progress 
+Usage:
 
-"docker exec" 
-    perform the below *prepare* and *payload* 
-    functions within the container started above. 
+* in one session start the base container with docker_run function
+
+~/sandbox/docker-mock-gitlab-ci.sh run
+    start container using "docker run", its 
+    interactive to allow checking the build in progress 
+
+* in another session run the payload within the container with docker_exec function
+
+~/sandbox/docker-mock-gitlab-ci.sh exec
+    performs the below *implicit* and *script* functions within the container started above. 
     The payload function invokes the junosw build.sh script 
 
 
-Thus this script allows candidate modifications to the CI workflow 
-to be tested without needing to change junosw/.gitlab-ci.yml 
-and without needing lots of pushes to trigger CI builds.
+This script allows candidate modifications to the CI workflow to be tested 
+without needing to change junosw/.gitlab-ci.yml and without needing 
+lots of pushes to trigger CI builds.
 
 The kind of changes to be tested:
 
 1. changing the base docker image to one that includes CUDA
 2. doing junosw+opticks build by setting OPTICKS_PREFIX to point
    to an Opticks release on /cvmfs/opticks.ihep.ac.cn/  
-
-Usage:
-
-* in one session start the base container with docker_run function::
-
-   ~/sandbox/docker-mock-gitlab-ci.sh r
-   
-In another session run the payload within the container with docker_exec function::
-
-   ~/sandbox/docker-mock-gitlab-ci.sh e
 
 EOU
 }
@@ -74,7 +70,7 @@ EOI
 }
 
 
-defarg=p
+defarg=script
 arg=${1:-$defarg}
 
 docker_ref(){  echo junosw/base:el9 ; }
@@ -82,7 +78,7 @@ docker_nam(){ echo jel9 ; }
 
 docker_run()
 {
-   : docker run - starting container with mounts from host into container 
+   : docker_run - starting container with mounts from host into container 
    type $FUNCNAME
    docker run --rm -it \
       --name $(docker_nam) \
@@ -94,12 +90,13 @@ docker_run()
 }
 docker_exec()
 {
-   : docker exec this script with defarg p doing prepare and payload with bash in the container 
+   : docker_exec this script with defarg script doing implicit+script with bash in the container 
    type $FUNCNAME
+   docker ps -a
    docker exec -i $(docker_nam) bash < $BASH_SOURCE  
 }
 
-prepare()
+implicit()
 {
     : implicitly done by gitlab-ci
 
@@ -109,7 +106,7 @@ prepare()
     pwd
 }
 
-payload()
+script()
 {
     : equivalent to the script block of junosw/.gitlab-ci.yml
 
@@ -126,10 +123,10 @@ payload()
 }
 
 case $arg in 
-  u) usage ;;
-  i) info ;;
-  r) docker_run ;;
-  e) docker_exec ;;
-  p) prepare ; payload ;; 
+  usage|h) usage ;;
+  info) info ;;
+  run) docker_run ;;
+  exec) docker_exec ;;
+  script) implicit ; script ;; 
 esac
 
