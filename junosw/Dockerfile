@@ -30,7 +30,7 @@ RUN dnf install 'dnf-command(config-manager)'
 RUN dnf config-manager --set-enabled crb
 
 RUN dnf install -y epel-release
-RUN dnf install -y almalinux-release-devel
+#RUN dnf install -y almalinux-release-devel
 RUN dnf install -y sudo redhat-lsb-core wget subversion \
         git make gcc-c++ gcc binutils \
         libX11-devel libXpm-devel libXft-devel libXext-devel \
