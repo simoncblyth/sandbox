@@ -42,7 +42,7 @@ jobs:
            tag=junosw/cuda:12.4.1-${recipe}-rockylinux9
            nam=junosw_cuda_12_4_1_${recipe}_rockylinux9
            #out=/tmp/$nam.tar   ## suspect less quota on /tmp 
-           out=$nam.tar
+           out=$PWD/$nam.tar
 
 
            echo recipe $recipe
@@ -57,9 +57,9 @@ jobs:
            echo "] build "
 
 
-           echo "[ df -h "
-           df -h
-           echo "] df -h "
+           #echo "[ df -h "
+           #df -h
+           #echo "] df -h "
            
            echo "[ image ls "
            date
@@ -84,9 +84,9 @@ jobs:
            echo "] save "
 
 
-           echo "[ df -h "
-           df -h
-           echo "] df -h "
+           #echo "[ df -h "
+           #df -h
+           #echo "] df -h "
  
 
            echo "[ du/tar tvf/ls  "
