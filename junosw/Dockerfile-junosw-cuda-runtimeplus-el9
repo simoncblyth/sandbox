@@ -1,0 +1,137 @@
+# Dockerfile-junosw-cuda-runtimeplus-el9
+# ========================================
+# 
+# This Dockerfile was developed starting from junosw-base-el9
+#
+# * https://code.ihep.ac.cn/JUNO/offline/junoenv/-/blob/main/docker/Dockerfile-junosw-base-el9
+#
+# Changes made:
+# 
+# 1. switch "FROM almalinux:9" to "FROM nvidia/cuda:12.4.1-runtime-rockylinux9" 
+#    using NVIDIA maintained images from hub.docker.com: 
+#
+#    * https://hub.docker.com/r/nvidia/cuda
+#    * https://hub.docker.com/layers/nvidia/cuda/12.4.1-base-rockylinux9/images/sha256-c7408d9311b55a4d891429977e338f858f030373691b3435811c569003f16a7b
+#    * https://hub.docker.com/layers/nvidia/cuda/12.4.1-runtime-rockylinux9/images/sha256-ad02f59a459778c7032e411610593f79e4523acea50eaadcde752ae5c1c91fe4
+#    * https://hub.docker.com/layers/nvidia/cuda/12.4.1-devel-rockylinux9/images/sha256-483ac85033dfcf05066887e530fbb18b9f0abac2a84545900ef53733559fb20e
+#
+#    with apparently corresponding Dockerfile accessible at:
+#
+#    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/base/Dockerfile
+#    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/runtime/Dockerfile
+#    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/devel/Dockerfile 
+#
+#    Some of the NVIDIA devel packages are included below to form "runtimeplus"
+#    while avoiding the large size of the devel image. 
+#
+#    +--------------+-----------+------------------------------------+
+#    | nam          | size      |  notes                             |
+#    +==============+===========+====================================+
+#    | base         |   2.51GB  |  no CUDA                           |
+#    +--------------+-----------+------------------------------------+
+#    | runtime      |   5.81GB  |  misses headers                    |
+#    +--------------+-----------+------------------------------------+
+#    | runtimeplus  |   7.5GB   |  cherrypick devel                  |      
+#    +--------------+-----------+------------------------------------+
+#    | devel        |  10GB+?   |  might be too big for GHA VM  ?    | 
+#    +--------------+-----------+------------------------------------+
+#
+# 2. Further changes were to accommodate almalinux:9 to rockylinux9 package differences, namely:
+#
+#    * replace almalinux-release-devel with rocky-repos   
+#    * skip redhat-lsb-core as not easily available for rockylinux9 and seems unused
+#
+# 3. Also some "dnf clean" is added to keep within the Github Action (GHA) VM quota of 14GB
+#
+# This was developed using the below GHA and Dockerfile
+# 
+# https://github.com/simoncblyth/sandbox/blob/master/.github/workflows/junosw-build-docker-image-and-scp.yml
+# https://github.com/simoncblyth/sandbox/blob/master/junosw/Dockerfile-junosw-cuda-runtimeplus-el9 
+#
+# The build of junosw+opticks was tested with the container created from the image defined by this 
+# Dockerfile using the below docker run/exec script:
+#
+# https://github.com/simoncblyth/sandbox/blob/master/docker-mock-gitlab-ci.sh  
+#
+
+FROM nvidia/cuda:12.4.1-runtime-rockylinux9 
+
+ENV NV_CUDA_LIB_VERSION 12.4.1-1
+ENV NV_CUDA_CUDART_DEV_VERSION 12.4.127-1
+
+RUN dnf install -y \
+    make \
+    findutils \
+    cuda-command-line-tools-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-libraries-devel-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-minimal-build-12-4-${NV_CUDA_LIB_VERSION} \
+    cuda-cudart-devel-12-4-${NV_CUDA_CUDART_DEV_VERSION} \
+    && dnf clean all \
+    && rm -rf /var/cache/yum/*
+
+#    ${NV_NVPROF_DEV_PACKAGE} \
+#    cuda-nvml-devel-12-4-${NV_NVML_DEV_VERSION} \
+#    libcublas-devel-12-4-${NV_LIBCUBLAS_DEV_VERSION} \
+#    ${NV_LIBNPP_DEV_PACKAGE} \
+#    ${NV_LIBNCCL_DEV_PACKAGE} \
+#    ${NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE} \
+
+ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
+
+
+
+ARG PASSWORD
+
+RUN useradd juno
+RUN usermod -G wheel -a juno
+RUN echo -n "assumeyes=1" >> /etc/yum.conf
+
+RUN dnf install 'dnf-command(config-manager)'
+RUN dnf config-manager --set-enabled crb
+
+RUN dnf install -y epel-release
+RUN dnf install -y rocky-repos   # looks equivalent to almalinux-release-devel
+
+#  skipped : redhat-lsb-core :  as not easily available for rockylinux9   
+RUN dnf install -y sudo wget subversion \
+        git make gcc-c++ gcc binutils \
+        libX11-devel libXpm-devel libXft-devel libXext-devel \
+        gcc-gfortran openssl-devel pcre-devel  \
+        mesa-libGL-devel glew-devel ftgl-devel mysql-devel \
+        fftw-devel cfitsio-devel graphviz-devel \
+        avahi-compat-libdns_sd-devel python3-devel \
+        libxml2-devel gsl-devel \
+        qt5-devel \
+        bzip2-devel imake patch ncurses-devel readline-devel \
+        sqlite-devel tk-devel openldap-devel \
+        motif motif-devel openmotif openmotif-devel \
+        wget libcurl-devel unzip bzip2 libicu-devel \
+        libglvnd-devel libXmu-devel 
+
+RUN echo 'juno ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+RUN sudo dnf install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm \
+  && sudo dnf install -y cvmfs \
+  && sudo mkdir /etc/cvmfs/keys/ihep.ac.cn \
+  && sudo curl -o /etc/cvmfs/keys/ihep.ac.cn/ihep.ac.cn.pub http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn/ihep.ac.cn.pub \
+  && sudo curl -o /etc/cvmfs/domain.d/ihep.ac.cn.conf http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn.conf \
+  && echo "CVMFS_REPOSITORIES='sft.cern.ch,juno.ihep.ac.cn,container.ihep.ac.cn'" | sudo tee    /etc/cvmfs/default.local \
+  && echo "CVMFS_HTTP_PROXY=DIRECT"                                                 | sudo tee -a /etc/cvmfs/default.local \
+  && cat /etc/cvmfs/default.local \
+  && sudo mkdir -p /cvmfs/sft.cern.ch \
+  && sudo mkdir -p /cvmfs/juno.ihep.ac.cn \
+  && sudo mkdir -p /cvmfs/container.ihep.ac.cn;
+
+RUN sudo dnf install -y expat-devel
+RUN sudo dnf install -y libtool
+RUN sudo dnf install -y libuuid-devel
+RUN sudo dnf install -y libnsl2-devel
+RUN sudo dnf install -y rsync
+
+# Github Action VM disk quota limit 14G
+RUN dnf clean all && rm -rf /var/cache/yum/*
+
+
+USER juno
+WORKDIR /home/juno
+

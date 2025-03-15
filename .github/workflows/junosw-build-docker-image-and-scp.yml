@@ -39,6 +39,7 @@ jobs:
            recipe=runtimeplus
            #recipe=devel
 
+           dok=junosw/Dockerfile-junosw-cuda-${recipe}-el9
            tag=junosw/cuda:12.4.1-${recipe}-rockylinux9
            nam=junosw_cuda_12_4_1_${recipe}_rockylinux9
            #out=/tmp/$nam.tar   ## suspect less quota on /tmp 
@@ -46,13 +47,14 @@ jobs:
 
 
            echo recipe $recipe
+           echo dok $dok
            echo tag $tag
            echo nam $nam
            echo out $out
 
            echo "[ build "
            date
-           docker build --tag $tag --platform linux/amd64 - < junosw/Dockerfile-junosw-cuda-${recipe}-rl9
+           docker build --tag $tag --platform linux/amd64 - < $dok
            date
            echo "] build "
 
