@@ -8,6 +8,9 @@ env:
 jobs:
   docker: 
     runs-on: ubuntu-latest 
+    env:
+       URL:${{ github.server_url }}/${{ github.repository }}/blob/master/${{ env.DOK  }}
+
     steps:
       - name: GitHub Checkout 
         uses: actions/checkout@v4
@@ -21,11 +24,11 @@ jobs:
       - name: build  
         run: |
            pwd
-           echo "[ build TAG [$TAG] DOK [$DOK]"
+           echo "[ build TAG [$TAG] DOK [$DOK] URL [$URL]"
            date
-           docker build --tag $TAG --platform linux/amd64 - < $DOK
+           #docker build --tag $TAG --label "src=$URL" --platform linux/amd64 - < $DOK
            date
-           echo "] build TAG [$TAG] DOK [$DOK]"
+           echo "] build TAG [$TAG] DOK [$DOK] URL [$URL]"
 
       - name: images  
         run: |
@@ -37,7 +40,7 @@ jobs:
            pwd
            echo "[ push TAG [$TAG] "
            date
-           docker push $TAG 
+           #docker push $TAG 
            date
            echo "] push TAG [$TAG] "
 
