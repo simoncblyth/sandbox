@@ -8,9 +8,6 @@ env:
 jobs:
   docker: 
     runs-on: ubuntu-latest 
-    env:
-       URL:https://github.com/${{ github.repository }}/blob/master/${{ env.DOK  }}
-
     steps:
       - name: GitHub Checkout 
         uses: actions/checkout@v4
@@ -22,13 +19,16 @@ jobs:
           password: ${{ secrets.SANDBOX_DOCKERHUB_SCB0 }}
 
       - name: build  
+        env:
+           SRC: https://github.com/${{ github.repository }}/blob/master/${{ env.DOK  }}
+
         run: |
            pwd
-           echo "[ build TAG [$TAG] DOK [$DOK] URL [$URL]"
+           echo "[ build TAG [$TAG] DOK [$DOK] SRC [$SRC]"
            date
-           #docker build --tag $TAG --label "src=$URL" --platform linux/amd64 - < $DOK
+           #docker build --tag $TAG --label "src=$SRC" --platform linux/amd64 - < $DOK
            date
-           echo "] build TAG [$TAG] DOK [$DOK] URL [$URL]"
+           echo "] build TAG [$TAG] DOK [$DOK] SRC [$SRC]"
 
       - name: images  
         run: |
