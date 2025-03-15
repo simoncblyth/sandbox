@@ -1,6 +1,10 @@
 name: simoncblyth-build-docker-image-and-push  
 on: [push]
 
+env:
+  DOK: junosw/Dockerfile-junosw-cuda-runtimeplus-el9
+  TAG: ${{ secrets.SANDBOX_DOCKERHUB_USER }}/cuda:12.4.1-runtimeplus-rockylinux9
+
 jobs:
   docker: 
     runs-on: ubuntu-latest 
@@ -8,44 +12,36 @@ jobs:
       - name: GitHub Checkout 
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
+      - name: DockerHub login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.SANDBOX_DOCKERHUB_USER }}
           password: ${{ secrets.SANDBOX_DOCKERHUB_SCB0 }}
 
-
-      - name: Build docker image and push 
+      - name: build  
         run: |
-           echo "[ Build docker image and push "
            pwd
-
-           #recipe=base
-           #recipe=runtime
-           recipe=runtimeplus
-           #recipe=devel
-
-           dok=junosw/Dockerfile-junosw-cuda-${recipe}-el9
-           tag=simoncblyth/cuda:12.4.1-${recipe}-rockylinux9
-
-           echo recipe $recipe
-           echo dok $dok
-           echo tag $tag
-
-           echo "[ build "
+           echo "[ build TAG [$TAG] DOK [$DOK]"
            date
-           docker build --tag $tag --platform linux/amd64 - < $dok
+           docker build --tag $TAG --platform linux/amd64 - < $DOK
            date
-           echo "] build "
+           echo "] build TAG [$TAG] DOK [$DOK]"
 
-           #echo "[ df -h "
-           #df -h
-           #echo "] df -h "
-           
-           echo "[ image ls "
+      - name: images  
+        run: |
+           pwd
+           docker images
+
+      - name: push
+        run: |
+           pwd
+           echo "[ push TAG [$TAG] "
            date
-           docker image ls
+           docker push $TAG 
            date
-           echo "] image ls "
+           echo "] push TAG [$TAG] "
+
+
+
 
 
