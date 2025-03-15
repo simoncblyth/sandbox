@@ -9,7 +9,7 @@ jobs:
   docker: 
     runs-on: ubuntu-latest 
     env:
-       URL:${{ github.server_url }}/${{ github.repository }}/blob/master/${{ env.DOK  }}
+       URL:https://github.com/${{ github.repository }}/blob/master/${{ env.DOK  }}
 
     steps:
       - name: GitHub Checkout 
