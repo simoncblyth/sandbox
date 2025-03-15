@@ -3,7 +3,8 @@ on: [push]
 
 env:
   DOK: junosw/Dockerfile-junosw-cuda-runtimeplus-el9
-  TAG: ${{ secrets.SANDBOX_DOCKERHUB_USER }}/cuda:12.4.1-runtimeplus-rockylinux9
+  NAM: simoncblyth
+  TAG: cuda:12.4.1-runtimeplus-rockylinux9
 
 jobs:
   docker: 
@@ -15,7 +16,7 @@ jobs:
       - name: DockerHub login
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.SANDBOX_DOCKERHUB_USER }}
+          username: ${{ env.NAM }}
           password: ${{ secrets.SANDBOX_DOCKERHUB_SCB0 }}
 
       - name: build  
@@ -24,11 +25,11 @@ jobs:
 
         run: |
            pwd
-           echo "[ build TAG [$TAG] DOK [$DOK] SRC [$SRC]"
+           echo "[ build --tag [$NAM/$TAG] DOK [$DOK] SRC [$SRC]"
            date
-           #docker build --tag $TAG --label "src=$SRC" --platform linux/amd64 - < $DOK
+           docker build --tag $NAM/$TAG --label "src=$SRC" --platform linux/amd64 - < $DOK
            date
-           echo "] build TAG [$TAG] DOK [$DOK] SRC [$SRC]"
+           echo "] build --tag [$NAM/$TAG] DOK [$DOK] SRC [$SRC]"
 
       - name: images  
         run: |
@@ -38,11 +39,11 @@ jobs:
       - name: push
         run: |
            pwd
-           echo "[ push TAG [$TAG] "
+           echo "[ push NAM/TAG [$NAM/$TAG] "
            date
-           #docker push $TAG 
+           docker push $NAM/$TAG 
            date
-           echo "] push TAG [$TAG] "
+           echo "] push NAM/TAG [$NAM/$TAG] "
 
 
 
