@@ -5,6 +5,7 @@ env:
   DOK: junosw/Dockerfile-junosw-cuda-runtimeplus-el9
   NAM: simoncblyth
   TAG: cuda:12.4.1-runtimeplus-rockylinux9
+# TAG: cuda:12.4.1-el9
 
 jobs:
   docker: 

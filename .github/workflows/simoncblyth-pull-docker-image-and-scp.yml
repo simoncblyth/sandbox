@@ -46,7 +46,7 @@ jobs:
            tag=${tag//./_}
            tag=${tag//-/_}
 
-           echo "TAR=${NAM}_${tag}" >> "$GITHUB_ENV"  
+           echo "TAR=/tmp/${NAM}_${tag}.tar" >> "$GITHUB_ENV"  
  
         shell: bash
 
@@ -56,34 +56,28 @@ jobs:
 
 
       - name: docker images  
-        if: ${{ env.LIVE }} == 1
         run: |
            docker images
 
       - name: docker manifest inspect 
-        if: ${{ env.LIVE }} == 1
         run: |
            docker manifest inspect -v $NAM/$TAG
 
       - name: docker buildx imagetools inspect 
-        if: ${{ env.LIVE }} == 1
         run: |
            docker buildx imagetools inspect $NAM/$TAG
 
       - name: docker save 
-        if: ${{ env.LIVE }} == 1
         run: |
            docker save $NAM/$TAG > $TAR
 
       - name: du/tar/ls 
-        if: ${{ env.LIVE }} == 1
         run: |
            du -h $TAR
            tar tvf $TAR
            ls -alst $TAR
 
       - name: scp 
-        if: ${{ env.LIVE }} == 1
         run: |
            date 
            scp $TAR ${{ secrets.SANDBOX_DEPLOY_USER }}@${{ secrets.SANDBOX_DEPLOY_HOST }}:${{ secrets.SANDBOX_DEPLOY_FOLD }}
