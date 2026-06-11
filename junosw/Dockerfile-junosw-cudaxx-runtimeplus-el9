@@ -1,0 +1,68 @@
+ARG CUDA_VERSION=13.1.2
+ARG OS_DISTRO=rockylinux9
+
+# Start from the runtime image (has the driver libraries, but no headers)
+FROM nvidia/cuda:${CUDA_VERSION}-runtime-${OS_DISTRO}
+
+ARG CUDA_VERSION
+
+# 1. Install ONLY the essential development packages needed to compile code
+# We use a dynamic variable to automatically match the 13-1 naming convention
+RUN CUDA_DASH=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 | tr '.' '-') && \
+    dnf install -y \
+    make \
+    findutils \
+    cuda-minimal-build-${CUDA_DASH} \
+    cuda-cudart-devel-${CUDA_DASH} \
+    cuda-libraries-devel-${CUDA_DASH} \
+    cuda-command-line-tools-${CUDA_DASH} \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+# Essential for the linker to find CUDA stubs during compilation
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+
+# 2. Setup the 'juno' system user for GitLab-CI
+RUN useradd juno && \
+    usermod -G wheel -a juno && \
+    echo "assumeyes=1" >> /etc/yum.conf
+
+# 3. Enable CRB and EPEL repositories
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --set-enabled crb && \
+    dnf install -y epel-release rocky-repos
+
+# 4. System dependencies required to build JUNOSW + Opticks
+RUN dnf install -y \
+    sudo wget subversion git make gcc-c++ gcc binutils rsync \
+    libX11-devel libXpm-devel libXft-devel libXext-devel \
+    gcc-gfortran openssl-devel pcre-devel \
+    mesa-libGL-devel glew-devel ftgl-devel mysql-devel \
+    fftw-devel cfitsio-devel graphviz-devel \
+    avahi-compat-libdns_sd-devel python3-devel \
+    libxml2-devel gsl-devel qt5-devel \
+    bzip2-devel imake patch ncurses-devel readline-devel \
+    sqlite-devel tk-devel openldap-devel \
+    motif motif-devel openmotif openmotif-devel \
+    libcurl-devel unzip bzip2 libicu-devel \
+    libglvnd-devel libXmu-devel \
+    expat-devel libtool libuuid-devel libnsl2-devel \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+RUN echo 'juno ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+# 5. CVMFS Setup (Allows GitLab-CI to mount external software stacks)
+RUN dnf install -y https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm \
+    && dnf install -y cvmfs \
+    && mkdir -p /etc/cvmfs/keys/ihep.ac.cn \
+    && curl -o /etc/cvmfs/keys/ihep.ac.cn/ihep.ac.cn.pub http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn/ihep.ac.cn.pub \
+    && curl -o /etc/cvmfs/domain.d/ihep.ac.cn.conf http://cvmfs-stratum-one.ihep.ac.cn/cvmfs/software/client_configure/ihep.ac.cn.conf \
+    && echo "CVMFS_REPOSITORIES='sft.cern.ch,juno.ihep.ac.cn,container.ihep.ac.cn'" | tee /etc/cvmfs/default.local \
+    && echo "CVMFS_HTTP_PROXY=DIRECT" | tee -a /etc/cvmfs/default.local \
+    && mkdir -p /cvmfs/sft.cern.ch /cvmfs/juno.ihep.ac.cn /cvmfs/container.ihep.ac.cn \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+USER juno
+WORKDIR /home/juno
