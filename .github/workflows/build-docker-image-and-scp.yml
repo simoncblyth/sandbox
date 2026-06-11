@@ -1,6 +1,7 @@
 
 name: build-docker-image-and-scp  
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   job0-build-docker-image-and-scp: 

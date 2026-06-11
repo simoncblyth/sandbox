@@ -1,6 +1,7 @@
 name: try-docker-pull
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   check-docker-version: 

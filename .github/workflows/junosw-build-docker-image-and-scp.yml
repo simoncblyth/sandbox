@@ -1,6 +1,7 @@
 
 name: junosw-build-docker-image-and-scp  
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   job0-junosw-build-docker-image-and-scp: 

@@ -1,7 +1,8 @@
 #https://docs.github.com/en/actions/writing-workflows/choosing-where-your-workflow-runs/running-jobs-in-a-container
 name: try-docker-container
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   check-docker-container-action: 

@@ -2,7 +2,8 @@
 
 name: try-docker-build
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   check-docker-build: 

@@ -1,5 +1,6 @@
 name: simoncblyth-build-docker-image-and-push  
-on: [push]
+on:
+  workflow_dispatch:
 
 env:
   DOK: junosw/Dockerfile-junosw-cuda-runtimeplus-el9

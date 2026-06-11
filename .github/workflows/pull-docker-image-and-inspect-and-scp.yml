@@ -1,6 +1,7 @@
 
 name: pull-docker-image-and-inspect-and-scp 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   job0-pull-docker-image-and-inspect-and-scp: 

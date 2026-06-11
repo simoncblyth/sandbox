@@ -1,6 +1,7 @@
 
 name: try-ssh-commands
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   check-ssh-commands: 

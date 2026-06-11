@@ -1,6 +1,7 @@
 # https://stackoverflow.com/questions/57549439/how-do-i-use-docker-with-github-actions 
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   vm:

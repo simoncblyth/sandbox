@@ -1,5 +1,6 @@
 name: simoncblyth-pull-docker-image-and-scp 
-on: [push]
+on:
+  workflow_dispatch:
 
 env:
   NAM: simoncblyth
