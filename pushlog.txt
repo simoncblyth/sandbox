@@ -1,0 +1,42 @@
+
+A[blyth@localhost sandbox]$ ./local/build.sh push
+./local/build.sh : Registering blueprint tag on Docker Hub...
+The push refers to repository [docker.io/simoncblyth/junosw]
+5f70bf18a086: Mounted from junosw/base 
+1619f09a3908: Pushed 
+00b76a62fec9: Mounted from junosw/base 
+b8098f7ee6aa: Mounted from junosw/base 
+3fc51c25bcb8: Mounted from junosw/base 
+e869fe1ff2f9: Mounted from junosw/base 
+041f185fe30d: Mounted from junosw/base 
+cbb36f5ba3ea: Mounted from junosw/base 
+3fcc1b8028b4: Mounted from junosw/base 
+1fc3acba7243: Mounted from junosw/base 
+66a5e1cad7dd: Mounted from junosw/base 
+45b676122ee7: Mounted from junosw/base 
+354523db755e: Mounted from junosw/base 
+el9.4-cuda13.1-opticks: digest: sha256:3d7e1900bd285d1eb4e5291b058c0d54be94b39ab48f7981ea8ccf69b0cbacb3 size: 3255
+./local/build.sh : Creating and pushing immutable release version tag (v1.0.0)...
+The push refers to repository [docker.io/simoncblyth/junosw]
+5f70bf18a086: Layer already exists 
+1619f09a3908: Layer already exists 
+00b76a62fec9: Layer already exists 
+b8098f7ee6aa: Layer already exists 
+3fc51c25bcb8: Layer already exists 
+e869fe1ff2f9: Layer already exists 
+041f185fe30d: Layer already exists 
+cbb36f5ba3ea: Layer already exists 
+3fcc1b8028b4: Layer already exists 
+1fc3acba7243: Layer already exists 
+66a5e1cad7dd: Layer already exists 
+45b676122ee7: Layer already exists 
+354523db755e: Layer already exists 
+v1.0.0: digest: sha256:3d7e1900bd285d1eb4e5291b058c0d54be94b39ab48f7981ea8ccf69b0cbacb3 size: 3255
+./local/build.sh : Capturing fresh cryptographic RepoDigest...
+--------------------------------------------------------
+ SUCCESSFUL PUSH TO DOCKER HUB
+ Deployment reference: simoncblyth/junosw@sha256:3d7e1900bd285d1eb4e5291b058c0d54be94b39ab48f7981ea8ccf69b0cbacb3
+--------------------------------------------------------
+A[blyth@localhost sandbox]$ 
+
+
