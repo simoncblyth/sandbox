@@ -72,7 +72,7 @@ if [[ "$arg" =~ build ]]; then
 fi
 
 
-if [[ "$arg" =! inspect ]]; then
+if [[ "$arg" =~ inspect ]]; then
    docker inspect --format='{{json .Config.Labels}}' $NAM/$TAG | jq   # jq pretty prints json
    [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from inspect && exit 1
 fi

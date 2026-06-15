@@ -43,7 +43,8 @@ LABEL org.opencontainers.image.base.name="docker.io/junosw/base:el9-9.4" \
 
 USER root
 
-ARG CUDA_VERSION=13.1.2   # CUDA_DASH obtained from 13.1.2 is 13-1
+ARG CUDA_VERSION=13.1.2
+# CUDA_DASH obtained from 13.1.2 is 13-1
 RUN CUDA_DASH=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 | tr '.' '-') && \
     dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo && \
     dnf install -y \
