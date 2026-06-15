@@ -43,7 +43,7 @@ SRC=https://github.com/simoncblyth/sandbox/blob/master/$DOK
 DOKP=$(realpath ../$DOK)
 CUDA_VERSION=$(sed -n 's/^ARG CUDA_VERSION=//p' $DOKP)  ## eg 13.1.2
 CUDA_VERS=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 )    ## eg 13.1
-IMG_VERS=v1.0.0
+IMG_VERS=v1.0.1
 NAM=simoncblyth
 TOP=junosw
 PUSH_REF=$NAM/$TOP:$IMG_VERS
