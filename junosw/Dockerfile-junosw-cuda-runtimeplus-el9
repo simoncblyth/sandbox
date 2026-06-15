@@ -1,14 +1,14 @@
 # Dockerfile-junosw-cuda-runtimeplus-el9
 # ========================================
-# 
+#
 # This Dockerfile was developed starting from junosw-base-el9
 #
 # * https://code.ihep.ac.cn/JUNO/offline/junoenv/-/blob/main/docker/Dockerfile-junosw-base-el9
 #
 # Changes made:
-# 
-# 1. switch "FROM almalinux:9" to "FROM nvidia/cuda:12.4.1-runtime-rockylinux9" 
-#    using NVIDIA maintained images from hub.docker.com: 
+#
+# 1. switch "FROM almalinux:9" to "FROM nvidia/cuda:12.4.1-runtime-rockylinux9"
+#    using NVIDIA maintained images from hub.docker.com:
 #
 #    * https://hub.docker.com/r/nvidia/cuda
 #    * https://hub.docker.com/layers/nvidia/cuda/12.4.1-base-rockylinux9/images/sha256-c7408d9311b55a4d891429977e338f858f030373691b3435811c569003f16a7b
@@ -19,10 +19,10 @@
 #
 #    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/base/Dockerfile
 #    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/runtime/Dockerfile
-#    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/devel/Dockerfile 
+#    * https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/rockylinux9/devel/Dockerfile
 #
 #    Some of the NVIDIA devel packages are included below to form "runtimeplus"
-#    while avoiding the large size of the devel image. 
+#    while avoiding the large size of the devel image.
 #
 #    +--------------+-----------+------------------------------------+
 #    | nam          | size      |  notes                             |
@@ -31,30 +31,30 @@
 #    +--------------+-----------+------------------------------------+
 #    | runtime      |   5.81GB  |  misses headers                    |
 #    +--------------+-----------+------------------------------------+
-#    | runtimeplus  |   7.5GB   |  cherrypick devel                  |      
+#    | runtimeplus  |   7.5GB   |  cherrypick devel                  |
 #    +--------------+-----------+------------------------------------+
-#    | devel        |  10GB+?   |  might be too big for GHA VM  ?    | 
+#    | devel        |  10GB+?   |  might be too big for GHA VM  ?    |
 #    +--------------+-----------+------------------------------------+
 #
 # 2. Further changes were to accommodate almalinux:9 to rockylinux9 package differences, namely:
 #
-#    * replace almalinux-release-devel with rocky-repos   
+#    * replace almalinux-release-devel with rocky-repos
 #    * skip redhat-lsb-core as not easily available for rockylinux9 and seems unused
 #
 # 3. Also some "dnf clean" is added to keep within the Github Action (GHA) VM quota of 14GB
 #
 # This was developed using the below GHA and Dockerfile
-# 
-# https://github.com/simoncblyth/sandbox/blob/master/.github/workflows/junosw-build-docker-image-and-scp.yml
-# https://github.com/simoncblyth/sandbox/blob/master/junosw/Dockerfile-junosw-cuda-runtimeplus-el9 
 #
-# The build of junosw+opticks was tested with the container created from the image defined by this 
+# https://github.com/simoncblyth/sandbox/blob/master/.github/workflows/junosw-build-docker-image-and-scp.yml
+# https://github.com/simoncblyth/sandbox/blob/master/junosw/Dockerfile-junosw-cuda-runtimeplus-el9
+#
+# The build of junosw+opticks was tested with the container created from the image defined by this
 # Dockerfile using the below docker run/exec script:
 #
-# https://github.com/simoncblyth/sandbox/blob/master/docker-mock-gitlab-ci.sh  
+# https://github.com/simoncblyth/sandbox/blob/master/docker-mock-gitlab-ci.sh
 #
 
-FROM nvidia/cuda:12.4.1-runtime-rockylinux9 
+FROM nvidia/cuda:12.4.1-runtime-rockylinux9
 
 ENV NV_CUDA_LIB_VERSION 12.4.1-1
 ENV NV_CUDA_CUDART_DEV_VERSION 12.4.127-1
@@ -92,7 +92,7 @@ RUN dnf config-manager --set-enabled crb
 RUN dnf install -y epel-release
 RUN dnf install -y rocky-repos   # looks equivalent to almalinux-release-devel
 
-#  skipped : redhat-lsb-core :  as not easily available for rockylinux9   
+#  skipped : redhat-lsb-core :  as not easily available for rockylinux9
 RUN dnf install -y sudo wget subversion \
         git make gcc-c++ gcc binutils \
         libX11-devel libXpm-devel libXft-devel libXext-devel \
@@ -106,7 +106,7 @@ RUN dnf install -y sudo wget subversion \
         sqlite-devel tk-devel openldap-devel \
         motif motif-devel openmotif openmotif-devel \
         wget libcurl-devel unzip bzip2 libicu-devel \
-        libglvnd-devel libXmu-devel 
+        libglvnd-devel libXmu-devel
 
 RUN echo 'juno ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 

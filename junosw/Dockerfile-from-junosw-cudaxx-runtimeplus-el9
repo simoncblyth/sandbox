@@ -1,0 +1,64 @@
+# Dockerfile-from-junosw-cudaxx-runtimeplus-el9 "simoncblyth/junosw:el9.4-cuda13.1-opticks"
+# ==========================================================================================
+#
+# This Dockerfile is implemented "FROM junosw/base:el9-9.4" adding
+# via dnf commands the CUDA 13.1 packages needed to build and test JUNOSW+Opticks
+# The base image "junosw/base:el9-9.4" provides the environment
+# within which JUNOSW is built and tested.
+#
+# URLs of the Dockerfile source and scripts used to build and test the image are:
+#
+# https://github.com/simoncblyth/sandbox/blob/master/junosw/Dockerfile-from-junosw-cudaxx-runtimeplus-el9
+# https://github.com/simoncblyth/sandbox/blob/master/local/build.sh
+# https://github.com/simoncblyth/sandbox/blob/master/docker-mock-gitlab-ci.sh
+#
+# Prior Dockerfile:
+#
+#  https://github.com/simoncblyth/sandbox/blob/master/junosw/Dockerfile-junosw-cuda-runtimeplus-el9
+#
+# The prior Dockerfile was based on the nvidia/cuda image is duplicitous coping
+# from junosw/base and adapting commands and package names from almalinux9 to rockylinux9.
+#
+#
+# Unlike previously tests were done locally on IHEP GPU Workstation, not via Git Hub Actions.
+# For clarity the command providing the base.digest is::
+#
+#   docker inspect --format='{{index .RepoDigests 0}}' junosw/base:el9-9.4 | cut -d'@' -f2
+#   sha256:70de4e38bd1a020c70fea89502d375da96bb6dc30d30ac42ff8c697961d2e1d9
+#
+
+FROM junosw/base:el9-9.4
+
+LABEL org.opencontainers.image.base.name="docker.io/junosw/base:el9-9.4" \
+      org.opencontainers.image.base.digest="sha256:70de4e38bd1a020c70fea89502d375da96bb6dc30d30ac42ff8c697961d2e1d9" \
+      org.opencontainers.image.title="junosw-opticks-build" \
+      org.opencontainers.image.description="Environment to build JUNO offline software with Opticks GPU accelerated optical photon simulation support" \
+      org.opencontainers.image.version="v0" \
+      org.opencontainers.image.vendor="JUNO Collaboration - Opticks" \
+      org.opencontainers.image.authors="simon.c.blyth@gmail.com" \
+      org.opencontainers.image.url="https://hub.docker.com/u/simoncblyth" \
+      org.opencontainers.image.source="PLACEHOLDER" \
+      org.opencontainers.image.revision="PLACEHOLDER" \
+      org.opencontainers.image.created="PLACEHOLDER"
+
+USER root
+
+ARG CUDA_VERSION=13.1.2   # CUDA_DASH obtained from 13.1.2 is 13-1
+RUN CUDA_DASH=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 | tr '.' '-') && \
+    dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo && \
+    dnf install -y \
+    cuda-minimal-build-${CUDA_DASH} \
+    cuda-cudart-devel-${CUDA_DASH} \
+    cuda-libraries-devel-${CUDA_DASH} \
+    cuda-command-line-tools-${CUDA_DASH} \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
+
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV HOME=/junosw
+# Setting HOME avoids broken paths from geant4-config when HOME defauts to "/"
+
+USER juno
+WORKDIR /home/juno
