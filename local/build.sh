@@ -1,18 +1,18 @@
 #!/bin/bash
 
-usage(){ cat << EOU
+sandbox_usage(){ cat << EOU
 build.sh
 ==========
 
 ::
 
-    ~/sandbox/local/build.sh info
-    ~/sandbox/local/build.sh build
-    ~/sandbox/local/build.sh login
-    ~/sandbox/local/build.sh push
-    ~/sandbox/local/build.sh inspect
-    ~/sandbox/local/build.sh look
-
+    ~/sandbox/local/build.sh usage      ## emit this help message
+    ~/sandbox/local/build.sh info       ## dump variable values
+    ~/sandbox/local/build.sh build      ## build the docker image - remember to increment IMG_VERS if are going to push the image to docker hub
+    ~/sandbox/local/build.sh login      ## only needed very infrequently as writes to auths sectionm of ~/.docker/config.json
+    ~/sandbox/local/build.sh push       ## upload new layers using a double tagging technique
+    ~/sandbox/local/build.sh inspect    ## dump metadata in the image
+    ~/sandbox/local/build.sh look       ## run the image
 
 Relevant base docker handles from https://hub.docker.com/r/junosw/base/tags::
 
@@ -43,7 +43,7 @@ SRC=https://github.com/simoncblyth/sandbox/blob/master/$DOK
 DOKP=$(realpath ../$DOK)
 CUDA_VERSION=$(sed -n 's/^ARG CUDA_VERSION=//p' $DOKP)  ## eg 13.1.2
 CUDA_VERS=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 )    ## eg 13.1
-IMG_VERS=v1.0.1
+IMG_VERS=v1.0.2
 NAM=simoncblyth
 TOP=junosw
 PUSH_REF=$NAM/$TOP:$IMG_VERS
@@ -63,6 +63,10 @@ vv="BASH_SOURCE PWD NAM DOK DOKP CUDA_VERSION CUDA_VERS TAG SRC IMG_VERS TOP PUS
 #defarg="info_build"
 defarg="info"
 arg=${1:-$defarg}
+
+if [[ "$arg" =~ usage|help ]]; then
+    sandbox_usage
+fi
 
 if [[ "$arg" =~ info ]]; then
    for v in $vv ; do printf "%30s : %s\n" "$v" "${!v}" ; done
