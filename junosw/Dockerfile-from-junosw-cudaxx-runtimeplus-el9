@@ -60,7 +60,7 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 ENV HOME=/home/juno
-# Explictly setting HOME avoids broken paths from geant4-config when HOME defauts to "/"
+# Explictly setting HOME avoids broken paths from geant4-config when HOME defaults to "/"
 
 USER juno
 WORKDIR /home/juno

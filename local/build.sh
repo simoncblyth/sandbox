@@ -13,6 +13,9 @@ build.sh
     ~/sandbox/local/build.sh push       ## upload new layers using a double tagging technique
     ~/sandbox/local/build.sh inspect    ## dump metadata in the image
     ~/sandbox/local/build.sh look       ## run the image
+    ~/sandbox/local/build.sh save       ## save the image to tar.gz file
+    ~/sandbox/local/build.sh ls         ## list the tarball
+    ~/sandbox/local/build.sh scp        ## scp the tarball
 
 Relevant base docker handles from https://hub.docker.com/r/junosw/base/tags::
 
@@ -55,7 +58,7 @@ case $BASIS in
   junosw) TAG=$TOP:el9.4-cuda$CUDA_VERS-opticks    ;;
 esac
 
-TGZPATH=$FOLD/${TAG//:/-}.tar.gz
+TGZPATH=$FOLD/${TAG//:/-}_${IMG_VERS}.tar.gz
 
 
 vv="BASH_SOURCE PWD NAM DOK DOKP CUDA_VERSION CUDA_VERS TAG SRC IMG_VERS TOP PUSH_REF FOLD TGZPATH"
@@ -118,6 +121,18 @@ if [[ "$arg" =~ push ]]; then
     echo "--------------------------------------------------------"
 fi
 
+
+if [[ "$arg" =~ inspect ]]; then
+   docker inspect --format='{{json .Config.Labels}}' $NAM/$TAG | jq   # jq pretty prints json
+   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from inspect && exit 1
+fi
+
+
+if [[ "$arg" =~ look ]]; then
+    docker run --gpus all -it --rm $NAM/$TAG /bin/bash
+   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from look && exit 1
+fi
+
 if [[ "$arg" =~ save ]]; then
    echo $BASH_SOURCE save to TGZPATH $TGZPATH
    docker save "$NAM/$TAG" | gzip > $TGZPATH
@@ -133,18 +148,6 @@ fi
 if [[ "$arg" =~ scp ]]; then
    scp $TGZPATH L:/hpcfs/juno/junogpu/blyth/
    [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from scp && exit 1
-fi
-
-
-if [[ "$arg" =~ inspect ]]; then
-   docker inspect --format='{{json .Config.Labels}}' $NAM/$TAG | jq   # jq pretty prints json
-   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from inspect && exit 1
-fi
-
-
-if [[ "$arg" =~ look ]]; then
-    docker run --gpus all -it --rm $NAM/$TAG /bin/bash
-   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from look && exit 1
 fi
 
 
