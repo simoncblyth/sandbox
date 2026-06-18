@@ -47,16 +47,18 @@ IMG_VERS=v1.0.1
 NAM=simoncblyth
 TOP=junosw
 PUSH_REF=$NAM/$TOP:$IMG_VERS
-
+FOLD=/tmp/$USER/sandbox
+mkdir -p $FOLD
 
 case $BASIS in
   cuda)   TAG=cuda:$CUDA_VERS-runtimeplus-rockylinux9   ;;
   junosw) TAG=$TOP:el9.4-cuda$CUDA_VERS-opticks    ;;
 esac
 
+TGZPATH=$FOLD/${TAG//:/-}.tar.gz
 
 
-vv="BASH_SOURCE PWD NAM DOK DOKP CUDA_VERSION CUDA_VERS TAG SRC IMG_VERS TOP PUSH_REF"
+vv="BASH_SOURCE PWD NAM DOK DOKP CUDA_VERSION CUDA_VERS TAG SRC IMG_VERS TOP PUSH_REF FOLD TGZPATH"
 
 #defarg="info_build"
 defarg="info"
@@ -112,6 +114,22 @@ if [[ "$arg" =~ push ]]; then
     echo "--------------------------------------------------------"
 fi
 
+if [[ "$arg" =~ save ]]; then
+   echo $BASH_SOURCE save to TGZPATH $TGZPATH
+   docker save "$NAM/$TAG" | gzip > $TGZPATH
+   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from save && exit 1
+fi
+
+if [[ "$arg" =~ ls ]]; then
+   echo $BASH_SOURCE ls TGZPATH $TGZPATH
+   ls -alst $TGZPATH
+   du -h $TGZPATH
+fi
+
+if [[ "$arg" =~ scp ]]; then
+   scp $TGZPATH L:/hpcfs/juno/junogpu/blyth/
+   [ $? -ne 0 ] && echo $BASH_SOURCE - ERROR from scp && exit 1
+fi
 
 
 if [[ "$arg" =~ inspect ]]; then

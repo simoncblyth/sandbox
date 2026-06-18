@@ -58,8 +58,9 @@ RUN CUDA_DASH=$(echo "${CUDA_VERSION}" | cut -d. -f1-2 | tr '.' '-') && \
 ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV HOME=/junosw
-# Setting HOME avoids broken paths from geant4-config when HOME defauts to "/"
+
+ENV HOME=/home/juno
+# Explictly setting HOME avoids broken paths from geant4-config when HOME defauts to "/"
 
 USER juno
 WORKDIR /home/juno
